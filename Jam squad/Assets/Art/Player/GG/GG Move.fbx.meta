@@ -38,8 +38,8 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: Armature.001|ArmatureAction.001 (1)
-      takeName: Armature.001|ArmatureAction.001
+      name: Armature.001|ArmatureAction
+      takeName: Armature.001|ArmatureAction
       internalID: -960898424075949690
       firstFrame: 0
       lastFrame: 81
