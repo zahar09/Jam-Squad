@@ -19,7 +19,9 @@ public class Cell : MonoBehaviour
     [SerializeField] private Ease easeType2 = Ease.OutBack;
 
     private Tweener positionTweener;
-    private int holderIndex = 0;
+    private int holderIndexToPut = 0;
+    private int holderIndexToDestroy = 0;
+
     private bool removIsStart = false;
 
 
@@ -27,16 +29,16 @@ public class Cell : MonoBehaviour
     {
         yield return new WaitForSeconds(5f); // Ждём 5 секунд перед началом
 
-        while (holderIndex >= 0)
+        while (holderIndexToDestroy >= 0)
         {
             // Проверяем индекс и существование слота
-            if (holderIndex >= holders.Length || holderIndex < 0)
+            if (holderIndexToDestroy >= holders.Length || holderIndexToDestroy < 0)
             {
-                Debug.LogError("Invalid holderIndex: " + holderIndex);
+                Debug.LogError("Invalid holderIndex: " + holderIndexToDestroy);
                 break;
             }
 
-            CollectableHolder currentHolder = holders[holderIndex];
+            CollectableHolder currentHolder = holders[holderIndexToDestroy];
 
             // Проверяем, что collectable существует
             if (currentHolder.collectable != null && currentHolder.collectable.gameObject != null)
@@ -50,17 +52,18 @@ public class Cell : MonoBehaviour
                         // Уничтожаем объект после анимации
                         Destroy(currentHolder.collectable.gameObject);
                         currentHolder.collectable = null;
-                        holderIndex--;
-                        if (holderIndex < 0)
+                        holderIndexToDestroy--;
+                        holderIndexToPut--;
+                        if (holderIndexToDestroy < 0)
                         {
-                            holderIndex = 0;
+                            holderIndexToDestroy = 0;
                             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                         }
                     });
             }
             else
             {
-                Debug.LogWarning("No collectable to remove at index " + holderIndex);
+                Debug.LogWarning("No collectable to remove at index " + holderIndexToDestroy);
             }
 
             // Уменьшаем индекс
@@ -80,12 +83,12 @@ public class Cell : MonoBehaviour
     public void TryToUpgrade(GameObject[] collectableObjs)
     {
         
-        if (holderIndex > 2) return;
+        if (holderIndexToPut > 2) return;
         for (int i = 0; i < 3; i++)
         {
             print("sdnajikbnkj");
             //holders[holderIndex].collectable = collectableObjs[i];
-            collectableObjs[i].transform.SetParent(holders[holderIndex].transform);
+            collectableObjs[i].transform.SetParent(holders[holderIndexToPut].transform);
             positionTweener = collectableObjs[i].transform.DOLocalMove(Vector3.zero, moveDuration)
              .SetEase(easeType)
              .SetUpdate(true);
@@ -93,10 +96,10 @@ public class Cell : MonoBehaviour
         }
 
         GameObject newObj_ = Instantiate(newObj);
-        newObj_.transform.SetParent(holders[holderIndex].transform);
+        newObj_.transform.SetParent(holders[holderIndexToPut].transform);
         newObj_.transform.localPosition = Vector3.zero;
         newObj_.transform.localScale = Vector3.zero;
-        holders[holderIndex].collectable = newObj_;
+        holders[holderIndexToPut].collectable = newObj_;
         newObj_.transform.DOScale(finalScale, duration)
             .SetEase(easeType2)
             .SetUpdate(true)
@@ -109,11 +112,12 @@ public class Cell : MonoBehaviour
             });
 
 
-        holderIndex++;
-        if(holderIndex == 3 && !removIsStart)
+        holderIndexToPut++;
+        holderIndexToDestroy++;
+        if(holderIndexToPut == 3 && !removIsStart)
         {
             removIsStart = true;
-            holderIndex--;
+            holderIndexToDestroy = 2;
             StartCoroutine(RemoveOneBall());
         }
     }

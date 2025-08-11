@@ -21,7 +21,8 @@ public class PlayerHolder : MonoBehaviour
 
     private Tweener positionTweener;
     private int countOfObj = 0;
-    
+    private string currentType;
+
 
     private void OnTriggerStay(Collider other)
     {
@@ -41,15 +42,26 @@ public class PlayerHolder : MonoBehaviour
                 objs[i] = holders[i].collectable;
                 holders[i].collectable = null;
             }
-            cell.TryToUpgrade(objs);
             countOfObj = 0;
+            currentType = null;
+            cell.TryToUpgrade(objs);
+            
         }
     }
 
     private void TryToCollect(CollectableObj collectableObj)
     {
+        
         foreach (CollectableHolder holder in holders)
         {
+            if (currentType == null)
+            {
+                currentType = collectableObj.type;
+            }
+            else if(collectableObj.type != currentType) 
+            {
+                break;
+            }
             if (holder.collectable == null)
             {
                 holder.collectable = collectableObj.gameObject;
@@ -60,6 +72,7 @@ public class PlayerHolder : MonoBehaviour
            .SetEase(easeType)
            .SetUpdate(true);
 
+                
                 Destroy(collectableObj);
                 countOfObj++;
                 break;
