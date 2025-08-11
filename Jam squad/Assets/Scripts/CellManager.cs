@@ -13,6 +13,7 @@ public class CellManager : MonoBehaviour
     [Header("Меню победы")]
     [SerializeField] private GameObject winMenu;
 
+
     private List<string> _availableMessages = new List<string>();
     // Start is called before the first frame update
     private void Start()
@@ -37,5 +38,6 @@ public class CellManager : MonoBehaviour
     private void WinGame()
     {
         winMenu.SetActive(true);
+
     }
 }
