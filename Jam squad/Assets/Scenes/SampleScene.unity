@@ -2425,7 +2425,7 @@ MonoBehaviour:
   messageTextes:
   - UGUGIUG
   - 123413
-  winMenu: {fileID: 0}
+  winMenu: {fileID: 1780470356}
 --- !u!4 &908951457
 Transform:
   m_ObjectHideFlags: 0
@@ -4337,7 +4337,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1780470357
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4953,6 +4953,17 @@ MonoBehaviour:
     collectable: {fileID: 0}
   moveDuration: 0.5
   easeType: 6
+  _cameraTransform: {fileID: 1780627582}
+  _duration: 0.5
+  _strength: 0.3
+  _vibrato: 10
+  _randomness: 90
+  _fadeOut: 1
+  wobbleAngle: 3
+  wobbleDuration: 2
+  startDelay: 0.5
+  delayBetween: 0.15
+  easeType2: 4
 --- !u!4 &1908884695 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3576060564383249212, guid: 5a947d9221a8c9f4bb7806e52964236a, type: 3}
