@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,12 +19,21 @@ public class Cell : MonoBehaviour
     [SerializeField] private float duration = 0.5f;
     [SerializeField] private Ease easeType2 = Ease.OutBack;
 
+    
+
     private Tweener positionTweener;
     private int holderIndexToPut = 0;
     private int holderIndexToDestroy = 0;
 
     private bool removIsStart = false;
 
+    private CellManager cellManager;
+
+
+    private void Start()
+    {
+        cellManager = FindAnyObjectByType<CellManager>();
+    }
 
     private IEnumerator RemoveOneBall()
     {
@@ -116,15 +126,14 @@ public class Cell : MonoBehaviour
         holderIndexToDestroy++;
         if(holderIndexToPut == 3 && !removIsStart)
         {
+            //GetMemoryMessage();
+            cellManager.GetMemoryMessage();
             removIsStart = true;
             holderIndexToDestroy = 2;
             StartCoroutine(RemoveOneBall());
         }
     }
 
-    private void GetMessage()
-    {
-
-    }
+    
 
 }
