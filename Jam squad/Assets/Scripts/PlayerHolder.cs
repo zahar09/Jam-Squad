@@ -27,13 +27,6 @@ public class PlayerHolder : MonoBehaviour
     [SerializeField] private float _randomness = 90f;
     [SerializeField] private bool _fadeOut = true;
 
-    [Header("Настройки покачивания")]
-    [SerializeField] private float wobbleAngle = 3f; // Угол наклона (3 градуса)
-    [SerializeField] private float wobbleDuration = 2f; // Длительность цикла
-    [SerializeField] private float startDelay = 0.5f; // Задержка перед стартом
-    [SerializeField] private float delayBetween = 0.15f; // Задержка между объектами
-    [SerializeField] private Ease easeType2 = Ease.InOutSine; // Плавность анимации
-
     private Tweener positionTweener;
     private int countOfObj = 0;
     private string currentType;
