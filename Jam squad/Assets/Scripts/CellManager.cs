@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
-using UnityEditor.VersionControl;
 using UnityEngine;
 
 public class CellManager : MonoBehaviour
@@ -13,6 +12,10 @@ public class CellManager : MonoBehaviour
 
     [Header("Меню победы")]
     [SerializeField] private GameObject winMenu;
+
+    [Header("Анимация поражения")]
+    [SerializeField] private SmoothFollowCamera _camera;
+
 
 
     private List<string> _availableMessages = new List<string>();
@@ -40,5 +43,12 @@ public class CellManager : MonoBehaviour
     {
         winMenu.SetActive(true);
 
+    }
+
+    public void LoosGame(GameObject cell)
+    {
+        _camera.target = cell.transform;
+        PlayerHolder player = FindAnyObjectByType<PlayerHolder>();
+        Destroy(player.gameObject);
     }
 }

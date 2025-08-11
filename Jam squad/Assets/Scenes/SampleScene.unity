@@ -2503,6 +2503,7 @@ MonoBehaviour:
   - UGUGIUG
   - 123413
   winMenu: {fileID: 1780470356}
+  _camera: {fileID: 0}
 --- !u!4 &908951457
 Transform:
   m_ObjectHideFlags: 0

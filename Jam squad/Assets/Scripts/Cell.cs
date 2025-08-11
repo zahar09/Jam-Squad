@@ -67,7 +67,8 @@ public class Cell : MonoBehaviour
                         if (holderIndexToDestroy < 0)
                         {
                             holderIndexToDestroy = 0;
-                            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                            cellManager.LoosGame(gameObject);
+                            //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                         }
                     });
             }
@@ -84,9 +85,11 @@ public class Cell : MonoBehaviour
             yield return new WaitForSeconds(5f);
         }
 
-        // Когда остался последний (или 0), перезагружаем сцену
-        Debug.Log("No more balls. Reloading scene...");
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        //Debug.Log("No more balls. Reloading scene...");
+        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        cellManager.LoosGame(gameObject);
+
     }
 
 
