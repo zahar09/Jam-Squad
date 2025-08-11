@@ -9,6 +9,11 @@ ModelImporter:
       assembly: UnityEngine.CoreModule
       name: Emission.001
     second: {fileID: 2100000, guid: 77c727b09b83a6f4aba322600fb801ec, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Stylized_Female_Anatomy.002
+    second: {fileID: 2100000, guid: aa365da8d01ab674aaf2798a531c1051, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
