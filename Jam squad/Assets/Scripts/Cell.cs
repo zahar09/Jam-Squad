@@ -19,7 +19,16 @@ public class Cell : MonoBehaviour
     [SerializeField] private float duration = 0.5f;
     [SerializeField] private Ease easeType2 = Ease.OutBack;
 
+    [Header("Настройки тряски")]
+    [SerializeField] private float shakeDuration = 0.3f;
+    [SerializeField] private float shakeStrength = 0.2f;
+    [SerializeField] private int vibrato = 10;
+    [SerializeField] private float randomness = 90f;
     
+
+
+    private Vector3 _originalScale;
+    private Sequence _shakeSequence;
 
     private Tweener positionTweener;
     private int holderIndexToPut = 0;
@@ -29,6 +38,11 @@ public class Cell : MonoBehaviour
 
     private CellManager cellManager;
 
+    private void Awake()
+    {
+        _originalScale = transform.localScale;
+
+    }
 
     private void Start()
     {
@@ -53,6 +67,7 @@ public class Cell : MonoBehaviour
             // Проверяем, что collectable существует
             if (currentHolder.collectable != null && currentHolder.collectable.gameObject != null)
             {
+                PlayShakeEffect();
                 // Анимируем уменьшение
                 currentHolder.collectable.gameObject.transform.DOScale(Vector3.zero, duration)
                     .SetEase(easeType2)
@@ -124,7 +139,7 @@ public class Cell : MonoBehaviour
                 }
             });
 
-
+        PlayShakeEffect();
         holderIndexToPut++;
         holderIndexToDestroy++;
         if(holderIndexToPut == 3 && !removIsStart)
@@ -137,6 +152,26 @@ public class Cell : MonoBehaviour
         }
     }
 
-    
+    public void PlayShakeEffect()
+    {
+        _shakeSequence?.Kill();
+
+        _shakeSequence = DOTween.Sequence();
+
+        _shakeSequence.Append(transform.DOShakeScale(
+                shakeDuration,
+                strength: shakeStrength,
+                vibrato: vibrato,
+                randomness: randomness
+            ).SetEase(Ease.OutQuad));
+
+        _shakeSequence.Append(transform.DOScale(_originalScale, 0.1f));
+    }
+
+    private void OnDestroy()
+    {
+        _shakeSequence?.Kill();
+    }
+
 
 }
