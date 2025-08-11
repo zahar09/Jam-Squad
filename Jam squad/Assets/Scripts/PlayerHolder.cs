@@ -19,10 +19,30 @@ public class PlayerHolder : MonoBehaviour
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private Ease easeType = Ease.OutQuad;
 
+    [Header("Тряска камеры")]
+    [SerializeField] private Transform _cameraTransform;
+    [SerializeField] private float _duration = 0.5f;
+    [SerializeField] private float _strength = 0.3f;
+    [SerializeField] private int _vibrato = 10;
+    [SerializeField] private float _randomness = 90f;
+    [SerializeField] private bool _fadeOut = true;
+
+    [Header("Настройки покачивания")]
+    [SerializeField] private float wobbleAngle = 3f; // Угол наклона (3 градуса)
+    [SerializeField] private float wobbleDuration = 2f; // Длительность цикла
+    [SerializeField] private float startDelay = 0.5f; // Задержка перед стартом
+    [SerializeField] private float delayBetween = 0.15f; // Задержка между объектами
+    [SerializeField] private Ease easeType2 = Ease.InOutSine; // Плавность анимации
+
     private Tweener positionTweener;
     private int countOfObj = 0;
     private string currentType;
+    private Vector3 _originalPosition;
 
+    private void Start()
+    {
+        _originalPosition = _cameraTransform.position;
+    }
 
     private void OnTriggerStay(Collider other)
     {
@@ -71,8 +91,9 @@ public class PlayerHolder : MonoBehaviour
                 positionTweener = collectableObj.transform.DOLocalMove(Vector3.zero, moveDuration)
            .SetEase(easeType)
            .SetUpdate(true);
+                //ShakeCamera();
 
-                
+
                 Destroy(collectableObj);
                 countOfObj++;
                 break;
@@ -81,6 +102,20 @@ public class PlayerHolder : MonoBehaviour
         
     }
 
-    
+    //public void ShakeCamera()
+    //{
+    //    _cameraTransform.DOShakePosition(
+    //        duration: _duration,
+    //        strength: _strength,
+    //        vibrato: _vibrato,
+    //        randomness: _randomness,
+    //        snapping: false,
+    //        fadeOut: _fadeOut
+    //    ).OnComplete(() => {
+    //        _cameraTransform.localPosition = _originalPosition;
+    //    });
+    //}
+
+
 
 }

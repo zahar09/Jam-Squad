@@ -24,14 +24,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2781552454624546152}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: -0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 12.38, y: -0.65, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1182994856266154333}
   m_Father: {fileID: 5748901089695918501}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
 --- !u!1 &2825909726975921686
 GameObject:
   m_ObjectHideFlags: 0
@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 269541284693379309}
   - component: {fileID: 3878020245632018891}
   m_Layer: 0
-  m_Name: Collectble
+  m_Name: Original
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

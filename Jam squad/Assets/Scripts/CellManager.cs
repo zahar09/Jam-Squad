@@ -7,6 +7,7 @@ using UnityEngine;
 public class CellManager : MonoBehaviour
 {
     [Header("Ячейки памяти")]
+    [SerializeField] private GameObject messageObj;
     [SerializeField] private TextMeshProUGUI messageUI;
     [SerializeField] private string[] messageTextes;
 
@@ -31,7 +32,7 @@ public class CellManager : MonoBehaviour
         int randomIndex = Random.Range(0, _availableMessages.Count);
         messageUI.text = _availableMessages[randomIndex];
         _availableMessages.RemoveAt(randomIndex);
-        messageUI.gameObject.SetActive(true);
+        messageObj.gameObject.SetActive(true);
 
     }
 
