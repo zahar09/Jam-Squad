@@ -1,15 +1,12 @@
 using DG.Tweening;
 using UnityEngine;
 
-
 [System.Serializable]
 public class CollectableHolder
 {
     public Transform transform;
     public GameObject collectable;
 }
-
-
 
 public class PlayerHolder : MonoBehaviour
 {
@@ -27,6 +24,10 @@ public class PlayerHolder : MonoBehaviour
     [SerializeField] private float _randomness = 90f;
     [SerializeField] private bool _fadeOut = true;
 
+    [Header("Звук подбора")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip[] _collectSounds;
+
     private Tweener positionTweener;
     private int countOfObj = 0;
     private string currentType;
@@ -35,6 +36,9 @@ public class PlayerHolder : MonoBehaviour
     private void Start()
     {
         _originalPosition = _cameraTransform.position;
+
+        if (_audioSource != null)
+            _audioSource.playOnAwake = false;
     }
 
     private void OnTriggerStay(Collider other)
@@ -42,36 +46,33 @@ public class PlayerHolder : MonoBehaviour
         CollectableObj collectableObj = other.GetComponent<CollectableObj>();
         if (collectableObj != null && Input.GetKey(KeyCode.E))
         {
-            print("asdmolkasm");
             TryToCollect(collectableObj);
         }
 
         Cell cell = other.GetComponent<Cell>();
-        if (cell != null && countOfObj == 3 && Input.GetKey(KeyCode.E)) 
+        if (cell != null && countOfObj == 3 && Input.GetKey(KeyCode.E))
         {
             GameObject[] objs = new GameObject[countOfObj];
-            for(int i = 0; i < 3; i++) 
-            { 
+            for (int i = 0; i < 3; i++)
+            {
                 objs[i] = holders[i].collectable;
                 holders[i].collectable = null;
             }
             countOfObj = 0;
             currentType = null;
             cell.TryToUpgrade(objs);
-            
         }
     }
 
     private void TryToCollect(CollectableObj collectableObj)
     {
-        
         foreach (CollectableHolder holder in holders)
         {
             if (currentType == null)
             {
                 currentType = collectableObj.type;
             }
-            else if(collectableObj.type != currentType) 
+            else if (collectableObj.type != currentType)
             {
                 break;
             }
@@ -79,20 +80,26 @@ public class PlayerHolder : MonoBehaviour
             {
                 holder.collectable = collectableObj.gameObject;
                 collectableObj.transform.SetParent(holder.transform);
-                //collectableObj.transform.localPosition = Vector3.zero;
 
                 positionTweener = collectableObj.transform.DOLocalMove(Vector3.zero, moveDuration)
-           .SetEase(easeType)
-           .SetUpdate(true);
-                //ShakeCamera();
+                    .SetEase(easeType)
+                    .SetUpdate(true);
 
-
+                PlayRandomCollectSound(); // Воспроизводим звук при подборе
                 Destroy(collectableObj);
                 countOfObj++;
                 break;
             }
         }
-        
+    }
+
+    public void PlayRandomCollectSound()
+    {
+        if (_audioSource == null || _collectSounds == null || _collectSounds.Length == 0)
+            return;
+
+        int randomIndex = Random.Range(0, _collectSounds.Length);
+        _audioSource.PlayOneShot(_collectSounds[randomIndex]);
     }
 
     //public void ShakeCamera()
@@ -108,7 +115,4 @@ public class PlayerHolder : MonoBehaviour
     //        _cameraTransform.localPosition = _originalPosition;
     //    });
     //}
-
-
-
 }

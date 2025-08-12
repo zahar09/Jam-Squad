@@ -769,6 +769,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 608189836}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!82 &199668153 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1485602208812977266, guid: 48d253ca51cd3cb44b64f761c44b2393, type: 3}
+  m_PrefabInstance: {fileID: 733033357}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &223974226
 GameObject:
   m_ObjectHideFlags: 0
@@ -4717,7 +4722,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1738493731
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4797,7 +4802,7 @@ VideoPlayer:
   m_VideoClip: {fileID: 32900000, guid: c149b848cbac0154babc4b53d91bb15d, type: 3}
   m_TargetCameraAlpha: 1
   m_TargetCamera3DLayout: 0
-  m_TargetCamera: {fileID: 0}
+  m_TargetCamera: {fileID: 1780627581}
   m_TargetTexture: {fileID: 0}
   m_TimeReference: 0
   m_TargetMaterialRenderer: {fileID: 0}
@@ -5465,6 +5470,11 @@ MonoBehaviour:
   _vibrato: 10
   _randomness: 90
   _fadeOut: 1
+  _audioSource: {fileID: 199668153}
+  _collectSounds:
+  - {fileID: 8300000, guid: 3a42f1e1ecd63e246989397cb3bab017, type: 3}
+  - {fileID: 8300000, guid: e38dc31f91e1a5347a979986bc8049bd, type: 3}
+  - {fileID: 8300000, guid: 7fda546ed62f50a4496741d9d65e0da0, type: 3}
 --- !u!4 &1908884695 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 3576060564383249212, guid: 5a947d9221a8c9f4bb7806e52964236a, type: 3}
