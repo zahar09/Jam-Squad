@@ -2,7 +2,7 @@ using DG.Tweening;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class StartMenu : MonoBehaviour, IPointerClickHandler
+public class StartMenu : MonoBehaviour
 {
     [Header("Animation Settings")]
     [SerializeField] private Transform[] _objects;
@@ -10,9 +10,14 @@ public class StartMenu : MonoBehaviour, IPointerClickHandler
     [SerializeField] private float _delayBetweenObjects = 0.3f;
     [SerializeField] private float _slideDistance = 500f;
 
-    [Header("Звук при клике на кнопку")]
+    [Header("Р—РІСѓРє РєР»РёРєР° РЅР° РєРЅРѕРїРєСѓ")]
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip[] _soundClips;
+
+    [Header("Global Light")]
+    [SerializeField] private Light _globalLight;
+    [SerializeField] private Color targetColor;
+    [SerializeField] private float duration;
 
     private Vector3[] _targetLocalPositions;
     private bool _isAnimating;
@@ -35,10 +40,7 @@ public class StartMenu : MonoBehaviour, IPointerClickHandler
         }
     }
 
-    public void OnPointerClick(PointerEventData eventData)
-    {
-        PlayRandomSound();
-    }
+    
 
     public void PlayRandomSound()
     {
@@ -47,6 +49,23 @@ public class StartMenu : MonoBehaviour, IPointerClickHandler
 
         int randomIndex = Random.Range(0, _soundClips.Length);
         _audioSource.PlayOneShot(_soundClips[randomIndex]);
+    }
+
+    public void ChangeLightColorOverTime()
+    {
+        print("asdj((((");
+        //if (GetComponent<Light>() == null)
+        //{
+        //    Debug.LogWarning("Light reference is null in ChangeLightColorOverTime.");
+        //    return;
+        //}
+        
+        DOTween.To(
+            () => _globalLight.color,
+            color => _globalLight.color = color,
+            targetColor,
+            duration
+        ).SetEase(Ease.Linear);
     }
 
     private void CacheTargetLocalPositions()
@@ -87,6 +106,7 @@ public class StartMenu : MonoBehaviour, IPointerClickHandler
                     });
             });
         }
+        
     }
 
     public void AnimateExit()
@@ -111,5 +131,6 @@ public class StartMenu : MonoBehaviour, IPointerClickHandler
                     });
             });
         }
+        //ChangeLightColorOverTime();
     }
 }
