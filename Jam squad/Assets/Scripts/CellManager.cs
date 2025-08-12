@@ -5,7 +5,6 @@ using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 using UnityEngine.SceneManagement;
-using Cinemachine;
 
 public class CellManager : MonoBehaviour
 {
@@ -13,7 +12,6 @@ public class CellManager : MonoBehaviour
     [SerializeField] private GameObject messageObj;
     [SerializeField] private TextMeshProUGUI messageUI;
     [SerializeField] private string[] messageTextes;
-    
 
     [Header("Меню победы")]
     [SerializeField] private GameObject winMenu;
@@ -21,8 +19,13 @@ public class CellManager : MonoBehaviour
 
     [Header("Анимация поражения")]
     [SerializeField] private SmoothFollowCamera _camera;
-    [SerializeField] private Image fadeImage; // Чёрный Image на весь экран
+    [SerializeField] private Image fadeImage;
     [SerializeField] private float fadeDuration = 1.5f;
+
+    [Header("Звук ячейки памяти")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip[] _soundClips; // Массив звуков
+
     
 
     private List<string> _availableMessages = new List<string>();
@@ -31,22 +34,33 @@ public class CellManager : MonoBehaviour
     {
         _availableMessages = new List<string>(messageTextes);
 
-        // Начальная настройка затемнения
         if (fadeImage != null)
         {
             fadeImage.color = new Color(0, 0, 0, 0);
             fadeImage.gameObject.SetActive(false);
         }
+
+        if (_audioSource != null)
+            _audioSource.playOnAwake = false;
+    }
+
+    // Публичный метод для воспроизведения случайного звука
+    public void PlayRandomSound()
+    {
+        if (_audioSource == null || _soundClips == null || _soundClips.Length == 0)
+            return;
+
+        int randomIndex = Random.Range(0, _soundClips.Length);
+        _audioSource.PlayOneShot(_soundClips[randomIndex]);
     }
 
     public void GetMemoryMessage()
     {
-        
-
         int randomIndex = Random.Range(0, _availableMessages.Count);
         messageUI.text = _availableMessages[randomIndex];
         _availableMessages.RemoveAt(randomIndex);
         messageObj.gameObject.SetActive(true);
+        PlayRandomSound();
 
         if (_availableMessages.Count == 0)
         {
@@ -57,12 +71,8 @@ public class CellManager : MonoBehaviour
 
     private void WinGame()
     {
-        //_endCamera.Priority = 15;
-        //_endCamera.gameObject.SetActive(true);
-        
         DOVirtual.DelayedCall(5f, () =>
         {
-            
             winMenu.SetActive(true);
         });
     }
@@ -75,7 +85,6 @@ public class CellManager : MonoBehaviour
 
         cell.transform.DOScale(0.5f, fadeDuration).SetEase(Ease.InOutQuad);
 
-
         StartCoroutine(FadeAndLose());
     }
 
@@ -85,17 +94,12 @@ public class CellManager : MonoBehaviour
         {
             fadeImage.gameObject.SetActive(true);
             fadeImage.DOFade(1f, fadeDuration).SetEase(Ease.InOutQuad)
-            .OnComplete(() =>
-             {
-                 SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-             });
-
-
+                .OnComplete(() =>
+                {
+                    SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+                });
         }
 
         yield return new WaitForSeconds(fadeDuration);
-
-        // Здесь можно добавить другие действия после затемнения
-        // Например, показать меню поражения
     }
 }

@@ -7,15 +7,19 @@ public class EnemyBall : MonoBehaviour
 {
     [SerializeField] private Transform player;        
     [SerializeField] private float moveSpeed = 3f;    
-    [SerializeField] private float rotationSpeed = 10f;  
+    [SerializeField] private float rotationSpeed = 10f;
+
+    
 
     private Rigidbody rb;
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == player.gameObject) 
-        { 
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        {
+            player.GetComponent<Player>().Die();
+            //PlayRandomSound(_soundClips);
+            //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
     }
 
@@ -46,4 +50,6 @@ public class EnemyBall : MonoBehaviour
         Vector3 targetPosition = transform.position + direction * moveSpeed * Time.fixedDeltaTime;
         rb.MovePosition(targetPosition);
     }
+
+    
 }

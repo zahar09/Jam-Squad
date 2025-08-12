@@ -1,11 +1,10 @@
 using DG.Tweening;
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
-public class Cell : MonoBehaviour 
+
+
+public class Cell : MonoBehaviour
 {
     [SerializeField] CollectableHolder[] holders;
 
@@ -13,9 +12,9 @@ public class Cell : MonoBehaviour
     [SerializeField] private float moveDuration = 0.5f;
     [SerializeField] private Ease easeType = Ease.OutQuad;
 
-    [Header("Настройка анимации обгрейда")]
+    [Header("Настройка анимации апгрейда")]
     [SerializeField] private GameObject newObj;
-    [SerializeField] private Vector3 finalScale = Vector3.one; 
+    [SerializeField] private Vector3 finalScale = Vector3.one;
     [SerializeField] private float duration = 0.5f;
     [SerializeField] private Ease easeType2 = Ease.OutBack;
 
@@ -24,24 +23,25 @@ public class Cell : MonoBehaviour
     [SerializeField] private float shakeStrength = 0.2f;
     [SerializeField] private int vibrato = 10;
     [SerializeField] private float randomness = 90f;
-    
 
+    [Header("Sound Settings")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip[] _upgradeSounds; // Звуки при апгрейде
 
     private Vector3 _originalScale;
     private Sequence _shakeSequence;
-
     private Tweener positionTweener;
     private int holderIndexToPut = 0;
     private int holderIndexToDestroy = 0;
-
     private bool removIsStart = false;
-
     private CellManager cellManager;
 
     private void Awake()
     {
         _originalScale = transform.localScale;
 
+        if (_audioSource != null)
+            _audioSource.playOnAwake = false;
     }
 
     private void Start()
@@ -51,11 +51,10 @@ public class Cell : MonoBehaviour
 
     private IEnumerator RemoveOneBall()
     {
-        yield return new WaitForSeconds(5f); // Ждём 5 секунд перед началом
+        yield return new WaitForSeconds(5f);
 
         while (holderIndexToDestroy >= 0)
         {
-            // Проверяем индекс и существование слота
             if (holderIndexToDestroy >= holders.Length || holderIndexToDestroy < 0)
             {
                 Debug.LogError("Invalid holderIndex: " + holderIndexToDestroy);
@@ -64,26 +63,25 @@ public class Cell : MonoBehaviour
 
             CollectableHolder currentHolder = holders[holderIndexToDestroy];
 
-            // Проверяем, что collectable существует
             if (currentHolder.collectable != null && currentHolder.collectable.gameObject != null)
             {
                 PlayShakeEffect();
-                // Анимируем уменьшение
+                
+
                 currentHolder.collectable.gameObject.transform.DOScale(Vector3.zero, duration)
                     .SetEase(easeType2)
                     .SetUpdate(true)
                     .OnComplete(() =>
                     {
-                        // Уничтожаем объект после анимации
                         Destroy(currentHolder.collectable.gameObject);
                         currentHolder.collectable = null;
                         holderIndexToDestroy--;
                         holderIndexToPut--;
+
                         if (holderIndexToDestroy < 0)
                         {
                             holderIndexToDestroy = 0;
                             cellManager.LoosGame(gameObject);
-                            //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
                         }
                     });
             }
@@ -92,35 +90,22 @@ public class Cell : MonoBehaviour
                 Debug.LogWarning("No collectable to remove at index " + holderIndexToDestroy);
             }
 
-            // Уменьшаем индекс
-            
-            
-
-            // Ждём перед следующим удалением
             yield return new WaitForSeconds(5f);
         }
 
-
-        //Debug.Log("No more balls. Reloading scene...");
-        //SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         cellManager.LoosGame(gameObject);
-
     }
-
 
     public void TryToUpgrade(GameObject[] collectableObjs)
     {
-        
         if (holderIndexToPut > 2) return;
+
         for (int i = 0; i < 3; i++)
         {
-            print("sdnajikbnkj");
-            //holders[holderIndex].collectable = collectableObjs[i];
             collectableObjs[i].transform.SetParent(holders[holderIndexToPut].transform);
             positionTweener = collectableObjs[i].transform.DOLocalMove(Vector3.zero, moveDuration)
-             .SetEase(easeType)
-             .SetUpdate(true);
-            
+                .SetEase(easeType)
+                .SetUpdate(true);
         }
 
         GameObject newObj_ = Instantiate(newObj);
@@ -128,6 +113,7 @@ public class Cell : MonoBehaviour
         newObj_.transform.localPosition = Vector3.zero;
         newObj_.transform.localScale = Vector3.zero;
         holders[holderIndexToPut].collectable = newObj_;
+
         newObj_.transform.DOScale(finalScale, duration)
             .SetEase(easeType2)
             .SetUpdate(true)
@@ -140,11 +126,13 @@ public class Cell : MonoBehaviour
             });
 
         PlayShakeEffect();
+        PlayRandomSound(_upgradeSounds); // Звук при апгрейде
+
         holderIndexToPut++;
         holderIndexToDestroy++;
-        if(holderIndexToPut == 3 && !removIsStart)
+
+        if (holderIndexToPut == 3 && !removIsStart)
         {
-            //GetMemoryMessage();
             cellManager.GetMemoryMessage();
             removIsStart = true;
             holderIndexToDestroy = 2;
@@ -157,7 +145,6 @@ public class Cell : MonoBehaviour
         _shakeSequence?.Kill();
 
         _shakeSequence = DOTween.Sequence();
-
         _shakeSequence.Append(transform.DOShakeScale(
                 shakeDuration,
                 strength: shakeStrength,
@@ -166,12 +153,20 @@ public class Cell : MonoBehaviour
             ).SetEase(Ease.OutQuad));
 
         _shakeSequence.Append(transform.DOScale(_originalScale, 0.1f));
+
+    }
+
+    public void PlayRandomSound(AudioClip[] clips)
+    {
+        if (_audioSource == null || clips == null || clips.Length == 0)
+            return;
+
+        int randomIndex = Random.Range(0, clips.Length);
+        _audioSource.PlayOneShot(clips[randomIndex]);
     }
 
     private void OnDestroy()
     {
         _shakeSequence?.Kill();
     }
-
-
 }
