@@ -119,6 +119,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Serotonin Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3537848436164232116, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.12
+      objectReference: {fileID: 0}
+    - target: {fileID: 3537848436164232116, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -2.45
+      objectReference: {fileID: 0}
     - target: {fileID: 3878020245632018891, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
       propertyPath: m_Height
       value: 1.9759064
@@ -175,6 +183,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5883337330762660599, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7137134878174691505, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
       propertyPath: m_LocalPosition.x
       value: 12.117
@@ -194,6 +206,26 @@ PrefabInstance:
     - target: {fileID: 7137134878174691505, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8459570011263128259, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_Range
+      value: 4.04
+      objectReference: {fileID: 0}
+    - target: {fileID: 8459570011263128259, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_Color.b
+      value: 0.089711644
+      objectReference: {fileID: 0}
+    - target: {fileID: 8459570011263128259, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_Color.g
+      value: 0.7216476
+      objectReference: {fileID: 0}
+    - target: {fileID: 8459570011263128259, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_Color.r
+      value: 0.9056604
+      objectReference: {fileID: 0}
+    - target: {fileID: 8459570011263128259, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_Intensity
+      value: 1.26
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
