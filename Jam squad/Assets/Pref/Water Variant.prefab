@@ -16,6 +16,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Water Variant
       objectReference: {fileID: 0}
+    - target: {fileID: 3537848436164232116, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3537848436164232116, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.07
+      objectReference: {fileID: 0}
     - target: {fileID: 5748901089695918501, guid: 48a381d5b9bbd5640aee6050d6e2f228, type: 3}
       propertyPath: m_LocalPosition.x
       value: 7.410529
