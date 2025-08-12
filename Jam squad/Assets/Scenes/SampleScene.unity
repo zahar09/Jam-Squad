@@ -1529,6 +1529,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hoverScale: 1.1
   _animationDuration: 0.2
+  _audioSource: {fileID: 733033358}
+  _hoverClips:
+  - {fileID: 8300000, guid: c4a7871cbfec4464f93c37eea782ddfc, type: 3}
+  - {fileID: 8300000, guid: e9874f7bf755e884288679cf35d2b0d4, type: 3}
+  - {fileID: 8300000, guid: a8530b371c7fb7745b66cc8e10388555, type: 3}
 --- !u!114 &611392011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1601,6 +1606,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 652065445}
+        m_TargetAssemblyTypeName: StartMenu, Assembly-CSharp
+        m_MethodName: PlayRandomSound
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -1981,6 +1998,9 @@ MonoBehaviour:
   _slideDuration: 0.8
   _delayBetweenObjects: 0.3
   _slideDistance: 500
+  _audioSource: {fileID: 701115441}
+  _soundClips:
+  - {fileID: 8300000, guid: 248b12d7a734df14984f0895a2bc5c73, type: 3}
 --- !u!1 &680679786 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: c397361e287e1a540a5235673bb7e93a, type: 3}
@@ -2143,6 +2163,11 @@ CanvasRenderer:
 Transform:
   m_CorrespondingSourceObject: {fileID: 3466158103691832234, guid: 63b16578a8df6ce4c89c1ca739ed63f5, type: 3}
   m_PrefabInstance: {fileID: 6961040340226018410}
+  m_PrefabAsset: {fileID: 0}
+--- !u!82 &701115441 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 7791243982077298922, guid: 48d253ca51cd3cb44b64f761c44b2393, type: 3}
+  m_PrefabInstance: {fileID: 733033357}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &705507993
 GameObject:
@@ -2352,6 +2377,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 48d253ca51cd3cb44b64f761c44b2393, type: 3}
+--- !u!82 &733033358 stripped
+AudioSource:
+  m_CorrespondingSourceObject: {fileID: 1796459609998816494, guid: 48d253ca51cd3cb44b64f761c44b2393, type: 3}
+  m_PrefabInstance: {fileID: 733033357}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &735720151
 GameObject:
   m_ObjectHideFlags: 0
@@ -3241,6 +3271,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hoverScale: 1.1
   _animationDuration: 0.2
+  _audioSource: {fileID: 733033358}
+  _hoverClips:
+  - {fileID: 8300000, guid: c4a7871cbfec4464f93c37eea782ddfc, type: 3}
+  - {fileID: 8300000, guid: e9874f7bf755e884288679cf35d2b0d4, type: 3}
+  - {fileID: 8300000, guid: a8530b371c7fb7745b66cc8e10388555, type: 3}
 --- !u!114 &1433288949
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3313,6 +3348,18 @@ MonoBehaviour:
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
         m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 652065445}
+        m_TargetAssemblyTypeName: StartMenu, Assembly-CSharp
+        m_MethodName: PlayRandomSound
+        m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
@@ -3966,6 +4013,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+      - m_Target: {fileID: 652065445}
+        m_TargetAssemblyTypeName: StartMenu, Assembly-CSharp
+        m_MethodName: PlayRandomSound
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
 --- !u!114 &1597246553
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4031,6 +4090,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _hoverScale: 1.1
   _animationDuration: 0.2
+  _audioSource: {fileID: 733033358}
+  _hoverClips:
+  - {fileID: 8300000, guid: c4a7871cbfec4464f93c37eea782ddfc, type: 3}
+  - {fileID: 8300000, guid: e9874f7bf755e884288679cf35d2b0d4, type: 3}
+  - {fileID: 8300000, guid: a8530b371c7fb7745b66cc8e10388555, type: 3}
 --- !u!1 &1600785469
 GameObject:
   m_ObjectHideFlags: 0

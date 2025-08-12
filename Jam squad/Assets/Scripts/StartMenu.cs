@@ -1,14 +1,18 @@
 using DG.Tweening;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
-public class StartMenu : MonoBehaviour
+public class StartMenu : MonoBehaviour, IPointerClickHandler
 {
+    [Header("Animation Settings")]
     [SerializeField] private Transform[] _objects;
     [SerializeField] private float _slideDuration = 0.5f;
     [SerializeField] private float _delayBetweenObjects = 0.3f;
     [SerializeField] private float _slideDistance = 500f;
+
+    [Header("Звук при клике на кнопку")]
+    [SerializeField] private AudioSource _audioSource;
+    [SerializeField] private AudioClip[] _soundClips;
 
     private Vector3[] _targetLocalPositions;
     private bool _isAnimating;
@@ -17,6 +21,9 @@ public class StartMenu : MonoBehaviour
     {
         CacheTargetLocalPositions();
         PrepareForAnimation();
+
+        if (_audioSource != null)
+            _audioSource.playOnAwake = false;
     }
 
     private void OnEnable()
@@ -26,6 +33,20 @@ public class StartMenu : MonoBehaviour
             PrepareForAnimation();
             AnimateEnter();
         }
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        PlayRandomSound();
+    }
+
+    public void PlayRandomSound()
+    {
+        if (_audioSource == null || _soundClips == null || _soundClips.Length == 0)
+            return;
+
+        int randomIndex = Random.Range(0, _soundClips.Length);
+        _audioSource.PlayOneShot(_soundClips[randomIndex]);
     }
 
     private void CacheTargetLocalPositions()
