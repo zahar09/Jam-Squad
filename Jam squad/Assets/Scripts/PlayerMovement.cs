@@ -4,16 +4,27 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float turnSpeed = 10f;
-    [SerializeField] Animator animator;
+
+    [Header("Visuals")]
+    [SerializeField] private Transform playerModel; // Только модель вращается (например, спрайт или 3D-меш)
+    [SerializeField] private Animator animator;
 
     private Rigidbody rb;
     private Vector3 movementInput;
-    
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        //animator = GetComponent<Animator>();
+
+        if (playerModel == null)
+        {
+            Debug.LogError("PlayerModel не назначен! Назначь в инспекторе.", this);
+        }
+
+        if (animator == null && playerModel != null)
+        {
+            animator = playerModel.GetComponent<Animator>();
+        }
     }
 
     void Update()
@@ -25,18 +36,28 @@ public class PlayerMovement : MonoBehaviour
 
         float movementMagnitude = movementInput.magnitude;
 
-        if (movementMagnitude > 0.1f)
+        // Вращаем ТОЛЬКО модель, если есть движение
+        if (movementMagnitude > 0.1f && playerModel != null)
         {
-            float targetAngle = Mathf.Atan2(movementInput.y, movementInput.x) * Mathf.Rad2Deg - 90f;
-            Quaternion targetRotation = Quaternion.Euler(0f, 0f, targetAngle);
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, turnSpeed * Time.deltaTime);
+            // Угол в зависимости от направления движения
+            float targetAngle = Mathf.Atan2(movementInput.x, movementInput.y) * Mathf.Rad2Deg; // Вверх = 0°
+            playerModel.rotation = Quaternion.Lerp(
+                playerModel.rotation,
+                Quaternion.Euler(0f, 0f, -targetAngle), // минус, чтобы корректно поворачивалось
+                turnSpeed * Time.deltaTime
+            );
         }
 
-        animator.SetFloat("Speed", movementMagnitude);
+        // Аниматор у модели
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", movementMagnitude);
+        }
     }
 
     void FixedUpdate()
     {
+        // Двигаем весь объект игрока (Rigidbody)
         rb.MovePosition(rb.position + movementInput * moveSpeed * Time.fixedDeltaTime);
     }
 }

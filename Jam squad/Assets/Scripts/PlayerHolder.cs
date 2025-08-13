@@ -28,10 +28,15 @@ public class PlayerHolder : MonoBehaviour
     [SerializeField] private AudioSource _audioSource;
     [SerializeField] private AudioClip[] _collectSounds;
 
+    [Header("Обучение")]
+    [SerializeField] private EButton eButton;
+
     private Tweener positionTweener;
     private int countOfObj = 0;
     private string currentType;
     private Vector3 _originalPosition;
+
+    private bool isItEducation = true;
 
     private void Start()
     {
@@ -44,12 +49,22 @@ public class PlayerHolder : MonoBehaviour
     private void OnTriggerStay(Collider other)
     {
         CollectableObj collectableObj = other.GetComponent<CollectableObj>();
+        if (collectableObj != null && isItEducation) 
+        {
+            eButton.gameObject.SetActive(true);
+        }
+
         if (collectableObj != null && Input.GetKey(KeyCode.E))
         {
             TryToCollect(collectableObj);
         }
 
         Cell cell = other.GetComponent<Cell>();
+        if (cell != null && isItEducation)
+        {
+            eButton.gameObject.SetActive(true);
+        }
+
         if (cell != null && countOfObj == 3 && Input.GetKey(KeyCode.E))
         {
             GameObject[] objs = new GameObject[countOfObj];
@@ -61,6 +76,25 @@ public class PlayerHolder : MonoBehaviour
             countOfObj = 0;
             currentType = null;
             cell.TryToUpgrade(objs);
+            isItEducation = false;
+            eButton.DisableObject();
+
+        }
+    }
+
+
+    private void OnTriggerExit(Collider other)
+    {
+        CollectableObj collectableObj = other.GetComponent<CollectableObj>();
+        if (collectableObj != null && isItEducation) 
+        {
+            eButton.DisableObject();
+        }
+
+        Cell cell = other.GetComponent<Cell>();
+        if (cell != null && isItEducation)
+        {
+            eButton.DisableObject();
         }
     }
 
@@ -87,7 +121,13 @@ public class PlayerHolder : MonoBehaviour
 
                 PlayRandomCollectSound(); // Воспроизводим звук при подборе
                 Destroy(collectableObj);
+                eButton.DisableObject();
                 countOfObj++;
+                if (countOfObj == 3)
+                {
+                    OnCollectThreeHormones();
+                }
+
                 break;
             }
         }
@@ -100,6 +140,19 @@ public class PlayerHolder : MonoBehaviour
 
         int randomIndex = Random.Range(0, _collectSounds.Length);
         _audioSource.PlayOneShot(_collectSounds[randomIndex]);
+    }
+
+    private void OnCollectThreeHormones()
+    {
+        if (!isItEducation)
+        {
+            return;
+        }
+        Education education = FindAnyObjectByType<Education>();
+        if (education != null) 
+        { 
+            education.ActivateCell();
+        }
     }
 
     //public void ShakeCamera()
