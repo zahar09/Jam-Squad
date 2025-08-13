@@ -29,7 +29,7 @@ public class PlayerHolder : MonoBehaviour
     [SerializeField] private AudioClip[] _collectSounds;
 
     [Header("Обучение")]
-    [SerializeField] private EButton eButton;
+    [SerializeField] private GameObject eButton;
 
     private Tweener positionTweener;
     private int countOfObj = 0;
@@ -77,7 +77,7 @@ public class PlayerHolder : MonoBehaviour
             currentType = null;
             cell.TryToUpgrade(objs);
             isItEducation = false;
-            eButton.DisableObject();
+            eButton.GetComponent<EButton>().DisableObject();
 
         }
     }
@@ -88,13 +88,13 @@ public class PlayerHolder : MonoBehaviour
         CollectableObj collectableObj = other.GetComponent<CollectableObj>();
         if (collectableObj != null && isItEducation) 
         {
-            eButton.DisableObject();
+            eButton.GetComponent<EButton>().DisableObject();
         }
 
         Cell cell = other.GetComponent<Cell>();
         if (cell != null && isItEducation)
         {
-            eButton.DisableObject();
+            eButton.GetComponent<EButton>().DisableObject();
         }
     }
 
@@ -121,7 +121,7 @@ public class PlayerHolder : MonoBehaviour
 
                 PlayRandomCollectSound(); // Воспроизводим звук при подборе
                 Destroy(collectableObj);
-                eButton.DisableObject();
+                eButton.GetComponent<EButton>().DisableObject();
                 countOfObj++;
                 if (countOfObj == 3)
                 {
