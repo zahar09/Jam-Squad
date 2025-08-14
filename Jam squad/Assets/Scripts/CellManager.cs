@@ -13,10 +13,6 @@ public class CellManager : MonoBehaviour
     [SerializeField] private TextMeshProUGUI messageUI;
     [SerializeField] private string[] messageTextes;
 
-    [Header("Меню победы")]
-    [SerializeField] private GameObject winMenu;
-    [SerializeField] private GameObject _endCamera;
-
     [Header("Анимация поражения")]
     [SerializeField] private SmoothFollowCamera _camera;
     [SerializeField] private Image fadeImage;
@@ -86,11 +82,8 @@ public class CellManager : MonoBehaviour
 
     private void WinGame()
     {
-        DOVirtual.DelayedCall(1f, () =>
-        {
-            winMenu.SetActive(true);
-            //_endCamera.SetActive(true);
-        });
+        GameManager gameManager = FindAnyObjectByType<GameManager>(); ;
+        gameManager.WinGame();
     }
 
     public void LoosGame(GameObject cell)
