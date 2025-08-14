@@ -6,13 +6,16 @@ public class Education : MonoBehaviour
 {
     [Header("Объекты")]
     [SerializeField] private GameObject player;
-    [SerializeField] private GameObject hormonesContainer; // Дочерний объект игрока (содержит гормоны)
+    [SerializeField] private GameObject firsthormonesContainer;
     [SerializeField] private GameObject firstCell;
+    [SerializeField] private GameObject secondhormonesContainer;
+    [SerializeField] private GameObject thirdhormonesContainer; // Новая группа гормонов
 
     [Header("Задержки")]
     [SerializeField] private float delayPlayer = 1f;
     [SerializeField] private float delayAfterPlayer = 1.5f;
     [SerializeField] private float delayBetweenHormones = 0.3f;
+    [SerializeField] private float delayAfterCell = 1.5f; // Задержка после появления клетки
     [SerializeField] private float animationDuration = 0.5f;
     [SerializeField] private AnimationCurve easeCurve = default;
 
@@ -31,12 +34,9 @@ public class Education : MonoBehaviour
     {
         if (player != null) player.SetActive(false);
         if (firstCell != null) firstCell.SetActive(false);
-
-        if (hormonesContainer != null)
-        {
-            // Отключаем контейнер, но не трогаем иерархию
-            hormonesContainer.SetActive(false);
-        }
+        if (firsthormonesContainer != null) firsthormonesContainer.SetActive(false);
+        if (secondhormonesContainer != null) secondhormonesContainer.SetActive(false);
+        if (thirdhormonesContainer != null) thirdhormonesContainer.SetActive(false);
     }
 
     private void ShowPlayer()
@@ -50,43 +50,46 @@ public class Education : MonoBehaviour
             .SetEase(easeCurve)
             .OnComplete(() =>
             {
-                Invoke(nameof(ShowHormones), delayAfterPlayer);
+                Invoke(nameof(ShowFirstHormones), delayAfterPlayer);
             });
     }
 
-    private void ShowHormones()
+    private void ShowFirstHormones()
+    {
+        ShowHormones(firsthormonesContainer);
+    }
+
+    private void ShowHormones(GameObject hormonesContainer)
     {
         if (hormonesContainer == null) return;
 
-        // 1. Сохраняем мировую позицию и вращение контейнера
+        // Сохраняем мировые позицию и вращение
         Vector3 worldPosition = hormonesContainer.transform.position;
         Quaternion worldRotation = hormonesContainer.transform.rotation;
 
-        // 2. Отвязываем от родителя, сохраняя позицию в мире
+        // Отвязываем от родителя, сохраняя мировые координаты
         hormonesContainer.transform.SetParent(null, false);
         hormonesContainer.transform.position = worldPosition;
         hormonesContainer.transform.rotation = worldRotation;
 
-        // 3. Включаем контейнер, чтобы дети стали активны
+        // Активируем контейнер
         hormonesContainer.SetActive(true);
 
-        // 4. Анимируем каждого гормона (дочернего объекта) по очереди
+        // Подготовка к анимации
         Transform[] hormoneTransforms = new Transform[hormonesContainer.transform.childCount];
-        Vector3[] localScales = new Vector3[hormonesContainer.transform.childCount];
+        Vector3[] targetScales = new Vector3[hormonesContainer.transform.childCount];
 
-        // Сохраняем начальные масштабы (на случай, если у них разные)
         for (int i = 0; i < hormonesContainer.transform.childCount; i++)
         {
             Transform child = hormonesContainer.transform.GetChild(i);
             hormoneTransforms[i] = child;
-            localScales[i] = child.localScale;
-
-            // Устанавливаем scale в 0 для анимации
-            child.localScale = Vector3.zero;
+            targetScales[i] = child.localScale;
+            child.localScale = Vector3.zero; // начальный масштаб
+            child.gameObject.SetActive(false); // скрываем до анимации
         }
 
-        // Запускаем анимацию поочерёдно
-        StartCoroutine(AnimateHormonesSequentially(hormoneTransforms, localScales));
+        // Запускаем поочерёдную анимацию гормонов
+        StartCoroutine(AnimateHormonesSequentially(hormoneTransforms, targetScales));
     }
 
     private IEnumerator AnimateHormonesSequentially(Transform[] hormones, Vector3[] targetScales)
@@ -95,9 +98,8 @@ public class Education : MonoBehaviour
         {
             Transform hormone = hormones[i];
             if (hormone == null) continue;
-            
+
             hormone.gameObject.SetActive(true);
-            // Анимируем появление
             hormone.DOScale(targetScales[i], animationDuration)
                    .SetEase(easeCurve);
 
@@ -111,14 +113,27 @@ public class Education : MonoBehaviour
 
         Vector3 worldPosition = firstCell.transform.position;
         Quaternion worldRotation = firstCell.transform.rotation;
-        Vector3 tartgetScale = firstCell.transform.localScale;
+        Vector3 targetScale = firstCell.transform.localScale;
 
         firstCell.transform.SetParent(null, false);
         firstCell.transform.position = worldPosition;
         firstCell.transform.rotation = worldRotation;
         firstCell.SetActive(true);
         firstCell.transform.localScale = Vector3.zero;
-        firstCell.transform.DOScale(tartgetScale, animationDuration)
-            .SetEase(easeCurve);
+
+        firstCell.transform.DOScale(targetScale, animationDuration)
+            .SetEase(easeCurve)
+            .OnComplete(() =>
+            {
+                // После анимации клетки — ждём и показываем две группы гормонов
+                Invoke(nameof(ShowNextHormoneGroups), delayAfterCell);
+            });
+    }
+
+    private void ShowNextHormoneGroups()
+    {
+        // Показываем вторую и третью группу гормонов ОДНОВРЕМЕННО
+        ShowHormones(secondhormonesContainer);
+        ShowHormones(thirdhormonesContainer);
     }
 }

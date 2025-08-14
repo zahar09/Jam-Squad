@@ -2,11 +2,9 @@ using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 
-
-
 public class Cell : MonoBehaviour
 {
-    [SerializeField] CollectableHolder[] holders;
+    [SerializeField] private CollectableHolder[] holders;
 
     [Header("Настройки анимации подбора")]
     [SerializeField] private float moveDuration = 0.5f;
@@ -26,11 +24,20 @@ public class Cell : MonoBehaviour
 
     [Header("Sound Settings")]
     [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private AudioClip[] _upgradeSounds; // Звуки при апгрейде
+    [SerializeField] private AudioClip[] _upgradeSounds;
+
+    [Header("Light Settings (3D)")]
+    [SerializeField] private Light _cellLight; // Основной источник света ячейки
+    [SerializeField] private Color finalLightColor = Color.green; // Цвет после апгрейда — теперь в инспекторе!
+
+    [Header("Color Animation Settings")]
+    [SerializeField] private float colorChangeDuration = 0.5f;
+    [SerializeField] private Ease colorEase = Ease.Linear;
 
     private Vector3 _originalScale;
     private Sequence _shakeSequence;
     private Tweener positionTweener;
+    private Tween _colorTween; // Для анимации цвета света
     private int holderIndexToPut = 0;
     private int holderIndexToDestroy = 0;
     private bool removIsStart = false;
@@ -66,7 +73,6 @@ public class Cell : MonoBehaviour
             if (currentHolder.collectable != null && currentHolder.collectable.gameObject != null)
             {
                 PlayShakeEffect();
-                
 
                 currentHolder.collectable.gameObject.transform.DOScale(Vector3.zero, duration)
                     .SetEase(easeType2)
@@ -126,18 +132,40 @@ public class Cell : MonoBehaviour
             });
 
         PlayShakeEffect();
-        PlayRandomSound(_upgradeSounds); // Звук при апгрейде
+        PlayRandomSound(_upgradeSounds);
 
         holderIndexToPut++;
         holderIndexToDestroy++;
 
         if (holderIndexToPut == 3 && !removIsStart)
         {
-            cellManager.GetMemoryMessage();
+            ChangeLightColor(finalLightColor);
+            cellManager.GetMemoryMessage(gameObject);
             removIsStart = true;
             holderIndexToDestroy = 2;
             StartCoroutine(RemoveOneBall());
         }
+        
+    }
+
+    public void ChangeLightColor(Color targetColor)
+    {
+        _colorTween?.Kill(); // Останавливаем предыдущую анимацию
+
+        if (_cellLight == null)
+        {
+            Debug.LogWarning("Свет (_cellLight) не назначен в инспекторе.");
+            return;
+        }
+
+        _colorTween = DOTween.To(
+                () => _cellLight.color,
+                color => _cellLight.color = color,
+                targetColor,
+                colorChangeDuration
+            )
+            .SetEase(colorEase)
+            .SetUpdate(true); // Работает при timeScale = 0
     }
 
     public void PlayShakeEffect()
@@ -153,13 +181,11 @@ public class Cell : MonoBehaviour
             ).SetEase(Ease.OutQuad));
 
         _shakeSequence.Append(transform.DOScale(_originalScale, 0.1f));
-
     }
 
     public void PlayRandomSound(AudioClip[] clips)
     {
-        if (_audioSource == null || clips == null || clips.Length == 0)
-            return;
+        if (_audioSource == null || clips == null || clips.Length == 0) return;
 
         int randomIndex = Random.Range(0, clips.Length);
         _audioSource.PlayOneShot(clips[randomIndex]);
@@ -168,5 +194,6 @@ public class Cell : MonoBehaviour
     private void OnDestroy()
     {
         _shakeSequence?.Kill();
+        _colorTween?.Kill();
     }
 }

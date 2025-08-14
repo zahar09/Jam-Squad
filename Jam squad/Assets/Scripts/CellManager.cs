@@ -24,10 +24,12 @@ public class CellManager : MonoBehaviour
 
     [Header("Звук ячейки памяти")]
     [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private AudioClip[] _soundClips; // Массив звуков
+    [SerializeField] private AudioClip[] _soundClips;
 
-    
+    [Header("Настройки обучения")]
+    [SerializeField] private float educationDelayBeforeShrink = 1f; // Задержка перед исчезновением
 
+    private bool isEducation = true;
     private List<string> _availableMessages = new List<string>();
 
     private void Start()
@@ -44,7 +46,6 @@ public class CellManager : MonoBehaviour
             _audioSource.playOnAwake = false;
     }
 
-    // Публичный метод для воспроизведения случайного звука
     public void PlayRandomSound()
     {
         if (_audioSource == null || _soundClips == null || _soundClips.Length == 0)
@@ -54,18 +55,37 @@ public class CellManager : MonoBehaviour
         _audioSource.PlayOneShot(_soundClips[randomIndex]);
     }
 
-    public void GetMemoryMessage()
+    public void GetMemoryMessage(GameObject cell)
     {
-        int randomIndex = Random.Range(0, _availableMessages.Count);
-        messageUI.text = _availableMessages[randomIndex];
-        _availableMessages.RemoveAt(randomIndex);
-        messageObj.gameObject.SetActive(true);
-        PlayRandomSound();
-
-        if (_availableMessages.Count == 0)
+        if (isEducation)
         {
-            WinGame();
-            return;
+            isEducation = false;
+
+            // Задержка перед началом анимации уменьшения
+            DOVirtual.DelayedCall(educationDelayBeforeShrink, () =>
+            {
+                cell.transform.DOScale(Vector3.zero, fadeDuration)
+                    .SetEase(Ease.InOutQuad)
+                    .OnComplete(() =>
+                    {
+                        Destroy(cell);
+                    });
+            });
+        }
+        else
+        {
+            if (_availableMessages.Count == 0) return;
+
+            int randomIndex = Random.Range(0, _availableMessages.Count);
+            messageUI.text = _availableMessages[randomIndex];
+            _availableMessages.RemoveAt(randomIndex);
+            messageObj.SetActive(true);
+            PlayRandomSound();
+
+            if (_availableMessages.Count == 0)
+            {
+                WinGame();
+            }
         }
     }
 
@@ -74,6 +94,7 @@ public class CellManager : MonoBehaviour
         DOVirtual.DelayedCall(5f, () =>
         {
             winMenu.SetActive(true);
+            _endCamera.SetActive(true);
         });
     }
 
@@ -81,10 +102,10 @@ public class CellManager : MonoBehaviour
     {
         _camera.target = cell.transform;
         PlayerHolder player = FindAnyObjectByType<PlayerHolder>();
-        Destroy(player.gameObject);
+        if (player != null)
+            Destroy(player.gameObject);
 
         cell.transform.DOScale(0.5f, fadeDuration).SetEase(Ease.InOutQuad);
-
         StartCoroutine(FadeAndLose());
     }
 
