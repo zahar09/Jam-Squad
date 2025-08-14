@@ -2,9 +2,18 @@ using DG.Tweening;
 using System.Collections;
 using UnityEngine;
 
+public enum CellType
+{
+    Normal,
+    Disappearing
+}
+
 public class Cell : MonoBehaviour
 {
     [SerializeField] private CollectableHolder[] holders;
+
+
+    [SerializeField] private CellType type = CellType.Normal;
 
     [Header("Настройки анимации подбора")]
     [SerializeField] private float moveDuration = 0.5f;
@@ -54,7 +63,7 @@ public class Cell : MonoBehaviour
     private Sequence _shakeSequence;
     private Tweener positionTweener;
     private Tween _colorTween; // Для анимации цвета света
-    private int holderIndexToPut = 0;
+    public int holderIndexToPut = 0;
     private int holderIndexToDestroy = 0;
     private bool removIsStart = false;
     private CellManager cellManager;
@@ -165,7 +174,8 @@ public class Cell : MonoBehaviour
             cellManager.GetMemoryMessage(gameObject);
             removIsStart = true;
             holderIndexToDestroy = 2;
-            StartCoroutine(RemoveOneBall());
+            if(type == CellType.Disappearing)
+                StartCoroutine(RemoveOneBall());
         }
         
     }
@@ -187,7 +197,14 @@ public class Cell : MonoBehaviour
                 colorChangeDuration
             )
             .SetEase(colorEase)
-            .SetUpdate(true); // Работает при timeScale = 0
+            .SetUpdate(true)
+            .OnComplete(() =>
+            {
+                if (type == CellType.Normal)
+                {
+                    //Destroy(this);
+                }
+            });
     }
 
     public void PlayShakeEffect()

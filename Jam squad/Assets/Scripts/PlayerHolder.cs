@@ -65,7 +65,7 @@ public class PlayerHolder : MonoBehaviour
             eButton.gameObject.SetActive(true);
         }
 
-        if (cell != null && countOfObj == 3 && Input.GetKey(KeyCode.E))
+        if (cell != null && countOfObj == 3 && Input.GetKey(KeyCode.E) && cell.holderIndexToPut <= 2)
         {
             GameObject[] objs = new GameObject[countOfObj];
             for (int i = 0; i < 3; i++)

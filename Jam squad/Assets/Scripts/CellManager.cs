@@ -69,12 +69,13 @@ public class CellManager : MonoBehaviour
         else
         {
             if (_availableMessages.Count == 0) return;
-
             int randomIndex = Random.Range(0, _availableMessages.Count);
             messageUI.text = _availableMessages[randomIndex];
             _availableMessages.RemoveAt(randomIndex);
             messageObj.SetActive(true);
             PlayRandomSound();
+            GameManager gameManager = FindAnyObjectByType<GameManager>();
+            gameManager.ActivateCell(3 - _availableMessages.Count);
 
             if (_availableMessages.Count == 0)
             {
@@ -85,10 +86,10 @@ public class CellManager : MonoBehaviour
 
     private void WinGame()
     {
-        DOVirtual.DelayedCall(5f, () =>
+        DOVirtual.DelayedCall(1f, () =>
         {
             winMenu.SetActive(true);
-            _endCamera.SetActive(true);
+            //_endCamera.SetActive(true);
         });
     }
 

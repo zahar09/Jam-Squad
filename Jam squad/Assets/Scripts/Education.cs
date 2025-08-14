@@ -140,13 +140,7 @@ public class Education : MonoBehaviour
 
     public void StartGame()
     {
-        Vector3 worldPosition = game.transform.position;
-        Quaternion worldRotation = game.transform.rotation;
-        Vector3 targetScale = game.transform.localScale;
-
-        game.transform.SetParent(null, false);
-        game.transform.position = worldPosition;
-        game.transform.rotation = worldRotation;
-        game.SetActive(true);
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
+        gameManager.ActivateCell(0);
     }
 }
