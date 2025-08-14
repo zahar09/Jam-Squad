@@ -1,5 +1,6 @@
 ﻿using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using System.Collections;
 using UnityEngine.UI;
 
@@ -132,8 +133,10 @@ public class GameManager : MonoBehaviour
     {
         if (victoryCamera == null || cameraWinTarget == null) return;
 
+        // Удаляем игрока (если есть)
         Player player = FindAnyObjectByType<Player>();
-        Destroy(player.gameObject);
+        if (player != null)
+            Destroy(player.gameObject);
 
         // Отключаем следящую камеру
         if (victoryCamera.TryGetComponent(out SmoothFollowCamera followCam))
@@ -211,6 +214,11 @@ public class GameManager : MonoBehaviour
             mainSequence.AppendCallback(() => fadeImage.gameObject.SetActive(true));
             mainSequence.Append(fadeImage.DOFade(1f, fadeTime));
         }
+
+        // 9. Перезагрузка сцены после затемнения
+        mainSequence.AppendCallback(() => {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+        });
 
         // Запускаем последовательность
         mainSequence.Play();
