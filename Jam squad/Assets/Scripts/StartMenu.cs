@@ -5,10 +5,15 @@ using UnityEngine.EventSystems;
 public class StartMenu : MonoBehaviour
 {
     [Header("Animation Settings")]
-    [SerializeField] private Transform[] _objects;
+    [SerializeField] private Transform[] _objects; // основные объекты меню (кнопки)
     [SerializeField] private float _slideDuration = 0.5f;
     [SerializeField] private float _delayBetweenObjects = 0.3f;
     [SerializeField] private float _slideDistance = 500f;
+
+    [Header("Credits Window")]
+    [SerializeField] private GameObject creditsWindow; // панель "Об авторах"
+    [SerializeField] private float creditsScaleDuration = 0.4f;
+    [SerializeField] private Ease creditsEase = Ease.OutBack;
 
     [Header("Звук клика на кнопку")]
     [SerializeField] private AudioSource _audioSource;
@@ -29,6 +34,13 @@ public class StartMenu : MonoBehaviour
 
         if (_audioSource != null)
             _audioSource.playOnAwake = false;
+
+        // Скрываем окно авторов при старте
+        if (creditsWindow != null)
+        {
+            creditsWindow.SetActive(false);
+            creditsWindow.transform.localScale = Vector3.zero;
+        }
     }
 
     private void OnEnable()
@@ -39,8 +51,6 @@ public class StartMenu : MonoBehaviour
             AnimateEnter();
         }
     }
-
-    
 
     public void PlayRandomSound()
     {
@@ -53,13 +63,12 @@ public class StartMenu : MonoBehaviour
 
     public void ChangeLightColorOverTime()
     {
-        print("asdj((((");
-        //if (GetComponent<Light>() == null)
-        //{
-        //    Debug.LogWarning("Light reference is null in ChangeLightColorOverTime.");
-        //    return;
-        //}
-        
+        if (_globalLight == null)
+        {
+            Debug.LogWarning("Global Light reference is null.");
+            return;
+        }
+
         DOTween.To(
             () => _globalLight.color,
             color => _globalLight.color = color,
@@ -100,13 +109,13 @@ public class StartMenu : MonoBehaviour
                 _objects[index].gameObject.SetActive(true);
                 _objects[index].DOLocalMoveX(_targetLocalPositions[index].x, _slideDuration)
                     .SetEase(Ease.OutBack)
-                    .OnComplete(() => {
+                    .OnComplete(() =>
+                    {
                         if (index == _objects.Length - 1)
                             _isAnimating = false;
                     });
             });
         }
-        
     }
 
     public void AnimateExit()
@@ -123,7 +132,8 @@ public class StartMenu : MonoBehaviour
 
                 _objects[index].DOLocalMoveX(endPos.x, _slideDuration)
                     .SetEase(Ease.InBack)
-                    .OnComplete(() => {
+                    .OnComplete(() =>
+                    {
                         _objects[index].gameObject.SetActive(false);
 
                         if (index == _objects.Length - 1)
@@ -131,6 +141,46 @@ public class StartMenu : MonoBehaviour
                     });
             });
         }
-        //ChangeLightColorOverTime();
+    }
+
+    // ✅ НОВОЕ: Открытие окна "Об авторах"
+    public void OpenCredits()
+    {
+        if (creditsWindow == null) return;
+
+        PlayRandomSound(); // звук при нажатии
+
+        // Сначала убираем основное меню
+        AnimateExit();
+
+        // Ждём, пока последний объект закончит анимацию ухода
+        DOVirtual.DelayedCall(_objects.Length * _delayBetweenObjects + _slideDuration, () =>
+        {
+            // Показываем окно авторов с анимацией появления
+            creditsWindow.SetActive(true);
+            creditsWindow.transform.localScale = Vector3.zero;
+            creditsWindow.transform.DOScale(Vector3.one, creditsScaleDuration)
+                .SetEase(creditsEase);
+        });
+    }
+
+    // ✅ НОВОЕ: Закрытие окна "Об авторах"
+    public void CloseCredits()
+    {
+        if (creditsWindow == null) return;
+
+        PlayRandomSound(); // звук при нажатии
+
+        // Сначала анимируем исчезновение окна авторов
+        creditsWindow.transform.DOScale(Vector3.zero, creditsScaleDuration)
+            .SetEase(Ease.InBack)
+            .OnComplete(() =>
+            {
+                creditsWindow.SetActive(false);
+
+                // Теперь возвращаем основное меню
+                PrepareForAnimation(); // сбрасываем позиции
+                AnimateEnter();
+            });
     }
 }

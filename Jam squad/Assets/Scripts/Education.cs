@@ -12,11 +12,16 @@ public class Education : MonoBehaviour
     [SerializeField] private GameObject thirdhormonesContainer;
     [SerializeField] private GameObject game;
 
+    [Header("Аудио (голоса)")]
+    [SerializeField] private AudioSource voice1Source;
+    [SerializeField] private AudioSource voice2Source;
+    [SerializeField] private AudioSource voice3Source;
+
     [Header("Задержки")]
     [SerializeField] private float delayPlayer = 1f;
     [SerializeField] private float delayAfterPlayer = 1.5f;
     [SerializeField] private float delayBetweenHormones = 0.3f;
-    [SerializeField] private float delayAfterCell = 1.5f; // Задержка после появления клетки
+    [SerializeField] private float delayAfterCell = 1.5f;
     [SerializeField] private float animationDuration = 0.5f;
     [SerializeField] private AnimationCurve easeCurve = default;
 
@@ -51,6 +56,8 @@ public class Education : MonoBehaviour
             .SetEase(easeCurve)
             .OnComplete(() =>
             {
+                // ✅ Голос 1: "Это вы"
+                PlayVoice(voice1Source);
                 Invoke(nameof(ShowFirstHormones), delayAfterPlayer);
             });
     }
@@ -68,15 +75,12 @@ public class Education : MonoBehaviour
         Vector3 worldPosition = hormonesContainer.transform.position;
         Quaternion worldRotation = hormonesContainer.transform.rotation;
 
-        // Отвязываем от родителя, сохраняя мировые координаты
         hormonesContainer.transform.SetParent(null, false);
         hormonesContainer.transform.position = worldPosition;
         hormonesContainer.transform.rotation = worldRotation;
 
-        // Активируем контейнер
         hormonesContainer.SetActive(true);
 
-        // Подготовка к анимации
         Transform[] hormoneTransforms = new Transform[hormonesContainer.transform.childCount];
         Vector3[] targetScales = new Vector3[hormonesContainer.transform.childCount];
 
@@ -85,15 +89,19 @@ public class Education : MonoBehaviour
             Transform child = hormonesContainer.transform.GetChild(i);
             hormoneTransforms[i] = child;
             targetScales[i] = child.localScale;
-            child.localScale = Vector3.zero; // начальный масштаб
-            child.gameObject.SetActive(false); // скрываем до анимации
+            child.localScale = Vector3.zero;
+            child.gameObject.SetActive(false);
         }
 
-        // Запускаем поочерёдную анимацию гормонов
-        StartCoroutine(AnimateHormonesSequentially(hormoneTransforms, targetScales));
+
+        StartCoroutine(AnimateHormonesSequentially(hormoneTransforms, targetScales, () =>
+        {
+            if (hormonesContainer == firsthormonesContainer)
+                PlayVoice(voice2Source);
+        }));
     }
 
-    private IEnumerator AnimateHormonesSequentially(Transform[] hormones, Vector3[] targetScales)
+    private IEnumerator AnimateHormonesSequentially(Transform[] hormones, Vector3[] targetScales, System.Action onCompleted = null)
     {
         for (int i = 0; i < hormones.Length; i++)
         {
@@ -101,11 +109,13 @@ public class Education : MonoBehaviour
             if (hormone == null) continue;
 
             hormone.gameObject.SetActive(true);
-            hormone.DOScale(targetScales[i], animationDuration)
-                   .SetEase(easeCurve);
+            hormone.DOScale(targetScales[i], animationDuration).SetEase(easeCurve);
 
             yield return new WaitForSeconds(delayBetweenHormones);
         }
+
+        // Все гормоны показаны → вызываем коллбэк
+        onCompleted?.Invoke();
     }
 
     public void ActivateCell()
@@ -126,21 +136,50 @@ public class Education : MonoBehaviour
             .SetEase(easeCurve)
             .OnComplete(() =>
             {
-                // После анимации клетки — ждём и показываем две группы гормонов
                 Invoke(nameof(ShowNextHormoneGroups), delayAfterCell);
             });
     }
 
     private void ShowNextHormoneGroups()
     {
-        // Показываем вторую и третью группу гормонов ОДНОВРЕМЕННО
         ShowHormones(secondhormonesContainer);
         ShowHormones(thirdhormonesContainer);
     }
 
     public void StartGame()
     {
+        PlayVoice(voice3Source);
+        // Запускаем игру через короткую задержку, чтобы голос начал играть
+        Invoke(nameof(LaunchGame), 2f);
+    }
+
+    private void LaunchGame()
+    {
         GameManager gameManager = FindAnyObjectByType<GameManager>();
-        gameManager.ActivateCell(0);
+        if (gameManager != null)
+        {
+            gameManager.ActivateCell(0);
+        }
+        else
+        {
+            Debug.LogError("GameManager не найден в сцене!");
+        }
+    }
+
+    // Универсальный метод для проигрывания голоса
+    private void PlayVoice(AudioSource source)
+    {
+        if (source != null && source.clip != null)
+        {
+            source.Play();
+        }
+        else if (source == null)
+        {
+            Debug.LogWarning("AudioSource не назначен.");
+        }
+        else
+        {
+            Debug.LogWarning("На AudioSource не назначен клип.");
+        }
     }
 }
