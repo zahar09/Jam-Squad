@@ -27,7 +27,9 @@ public class CellManager : MonoBehaviour
     [SerializeField] private AudioClip[] _soundClips;
 
     [Header("Настройки обучения")]
-    [SerializeField] private float educationDelayBeforeShrink = 1f; // Задержка перед исчезновением
+    [SerializeField] private float educationDelayBeforeShrink;
+
+
 
     private bool isEducation = true;
     private List<string> _availableMessages = new List<string>();
@@ -62,15 +64,7 @@ public class CellManager : MonoBehaviour
             isEducation = false;
 
             // Задержка перед началом анимации уменьшения
-            DOVirtual.DelayedCall(educationDelayBeforeShrink, () =>
-            {
-                cell.transform.DOScale(Vector3.zero, fadeDuration)
-                    .SetEase(Ease.InOutQuad)
-                    .OnComplete(() =>
-                    {
-                        Destroy(cell);
-                    });
-            });
+            cell.GetComponent<Cell>().DestroyCell(educationDelayBeforeShrink);
         }
         else
         {
@@ -105,7 +99,7 @@ public class CellManager : MonoBehaviour
         if (player != null)
             Destroy(player.gameObject);
 
-        cell.transform.DOScale(0.5f, fadeDuration).SetEase(Ease.InOutQuad);
+        cell.GetComponent<Cell>().DestroyCell(0f);
         StartCoroutine(FadeAndLose());
     }
 

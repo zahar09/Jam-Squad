@@ -88,6 +88,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8ae7efa0987b35a40b51b6d937a3f271, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _neuronRiseSource: {fileID: 0}
+  _neuronRiseSounds:
+  - {fileID: 8300000, guid: 48d7e98a82e5ef6439c510f1b24ccacc, type: 3}
+  - {fileID: 8300000, guid: 2db3224d71569a049b8d842190f1d07f, type: 3}
+  - {fileID: 8300000, guid: 5200f611142a90f4e93d9cc5e60e5555, type: 3}
   type: 1
 --- !u!136 &3878020245632018891
 CapsuleCollider:

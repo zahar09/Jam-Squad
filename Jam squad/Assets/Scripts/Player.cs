@@ -9,11 +9,20 @@ public class Player : MonoBehaviour
     [SerializeField] private float _restartDelay = 1f;
 
     [Header("Звук смерти")]
-    [SerializeField] private AudioSource _audioSource;
-    [SerializeField] private AudioClip[] _deathSounds;
+    [SerializeField] private AudioSource _playerDeadSource;
+    [SerializeField] private AudioClip[] _playerDeadSounds;
+
+    [Header("Звук появления")]
+    [SerializeField] private AudioSource _plyaerRiseSource;
+    [SerializeField] private AudioClip[] _plyaerRiseSounds;
 
     private Vector3 _originalScale;
     private bool _isDead = false;
+
+    private void OnEnable()
+    {
+        PlayRandomSound(_plyaerRiseSource, _plyaerRiseSounds);
+    }
 
     private void Awake()
     {
@@ -25,10 +34,8 @@ public class Player : MonoBehaviour
         if (_isDead) return;
         _isDead = true;
 
-        // Проигрываем случайный звук смерти
-        PlayRandomDeathSound();
+        PlayRandomSound(_playerDeadSource, _playerDeadSounds);
 
-        // Анимация уменьшения
         transform.DOScale(Vector3.zero, _deathDuration)
             .SetEase(Ease.InBack)
             .OnComplete(() =>
@@ -37,13 +44,13 @@ public class Player : MonoBehaviour
             });
     }
 
-    private void PlayRandomDeathSound()
+    private void PlayRandomSound(AudioSource audioSource, AudioClip[] audioClips)
     {
-        if (_audioSource == null || _deathSounds == null || _deathSounds.Length == 0)
+        if (audioSource == null || audioClips == null || audioClips.Length == 0)
             return;
 
-        int randomIndex = Random.Range(0, _deathSounds.Length);
-        _audioSource.PlayOneShot(_deathSounds[randomIndex]);
+        int randomIndex = Random.Range(0, audioClips.Length);
+        audioSource.PlayOneShot(audioClips[randomIndex]);
     }
 
     private IEnumerator RestartSceneWithDelay()

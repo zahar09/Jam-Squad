@@ -16,21 +16,37 @@ public class Cell : MonoBehaviour
     [SerializeField] private float duration = 0.5f;
     [SerializeField] private Ease easeType2 = Ease.OutBack;
 
+    [Header("Настройки анимации смерти")]
+    [SerializeField] private float fadeDuration;
+    
+
     [Header("Настройки тряски")]
     [SerializeField] private float shakeDuration = 0.3f;
     [SerializeField] private float shakeStrength = 0.2f;
     [SerializeField] private int vibrato = 10;
     [SerializeField] private float randomness = 90f;
 
-    [Header("Sound Settings")]
-    [SerializeField] private AudioSource _audioSource;
+    [Header("Звуки")]
+    [Header("Свук крафта нейрона")]
+    [SerializeField] private AudioSource _upgradeSource;
     [SerializeField] private AudioClip[] _upgradeSounds;
+    [Header("Звук смерти нейрона")]
+    [SerializeField] private AudioSource _removeOneBallSource;
+    [SerializeField] private AudioClip[] _removeOneBallSounds;
+    [Header("Звук появления клетки")]
+    [SerializeField] private AudioSource _cellRiseSource;
+    [SerializeField] private AudioClip[] _cellRiseSounds;
+    [Header("Звук смерти клетки")]
+    [SerializeField] private AudioSource _cellDeadSource;
+    [SerializeField] private AudioClip[] _cellDeadSounds;
+    
 
-    [Header("Light Settings (3D)")]
+
+    [Header("Настройки света")]
     [SerializeField] private Light _cellLight; // Основной источник света ячейки
     [SerializeField] private Color finalLightColor = Color.green; // Цвет после апгрейда — теперь в инспекторе!
 
-    [Header("Color Animation Settings")]
+    [Header("Настройки анимации смены цвета")]
     [SerializeField] private float colorChangeDuration = 0.5f;
     [SerializeField] private Ease colorEase = Ease.Linear;
 
@@ -47,13 +63,18 @@ public class Cell : MonoBehaviour
     {
         _originalScale = transform.localScale;
 
-        if (_audioSource != null)
-            _audioSource.playOnAwake = false;
+        //if (_audioSource != null)
+        //    _audioSource.playOnAwake = false;
     }
 
     private void Start()
     {
         cellManager = FindAnyObjectByType<CellManager>();
+    }
+
+    private void OnEnable()
+    {
+        PlayRandomSound(_cellRiseSounds, _cellRiseSource);
     }
 
     private IEnumerator RemoveOneBall()
@@ -83,6 +104,7 @@ public class Cell : MonoBehaviour
                         currentHolder.collectable = null;
                         holderIndexToDestroy--;
                         holderIndexToPut--;
+                        PlayRandomSound(_removeOneBallSounds, _removeOneBallSource);
 
                         if (holderIndexToDestroy < 0)
                         {
@@ -132,7 +154,7 @@ public class Cell : MonoBehaviour
             });
 
         PlayShakeEffect();
-        PlayRandomSound(_upgradeSounds);
+        PlayRandomSound(_upgradeSounds, _upgradeSource);
 
         holderIndexToPut++;
         holderIndexToDestroy++;
@@ -183,12 +205,28 @@ public class Cell : MonoBehaviour
         _shakeSequence.Append(transform.DOScale(_originalScale, 0.1f));
     }
 
-    public void PlayRandomSound(AudioClip[] clips)
+    public void PlayRandomSound(AudioClip[] clips, AudioSource audioSource)
     {
-        if (_audioSource == null || clips == null || clips.Length == 0) return;
+        if (audioSource == null || clips == null || clips.Length == 0) return;
 
         int randomIndex = Random.Range(0, clips.Length);
-        _audioSource.PlayOneShot(clips[randomIndex]);
+        audioSource.PlayOneShot(clips[randomIndex]);
+    }
+
+    public void DestroyCell(float educationDelayBeforeShrink)
+    {
+        DOVirtual.DelayedCall(educationDelayBeforeShrink, () =>
+        {
+            PlayRandomSound(_cellDeadSounds, _cellDeadSource);
+            gameObject.transform.DOScale(Vector3.zero, fadeDuration)
+                .SetEase(Ease.InOutQuad)
+                .OnComplete(() =>
+                {
+                    Education education = FindAnyObjectByType<Education>();
+                    education.StartGame();
+                    Destroy(gameObject);
+                });
+        });
     }
 
     private void OnDestroy()
@@ -196,4 +234,6 @@ public class Cell : MonoBehaviour
         _shakeSequence?.Kill();
         _colorTween?.Kill();
     }
+
+
 }

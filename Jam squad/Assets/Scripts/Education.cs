@@ -9,7 +9,8 @@ public class Education : MonoBehaviour
     [SerializeField] private GameObject firsthormonesContainer;
     [SerializeField] private GameObject firstCell;
     [SerializeField] private GameObject secondhormonesContainer;
-    [SerializeField] private GameObject thirdhormonesContainer; // Новая группа гормонов
+    [SerializeField] private GameObject thirdhormonesContainer;
+    [SerializeField] private GameObject game;
 
     [Header("Задержки")]
     [SerializeField] private float delayPlayer = 1f;
@@ -135,5 +136,17 @@ public class Education : MonoBehaviour
         // Показываем вторую и третью группу гормонов ОДНОВРЕМЕННО
         ShowHormones(secondhormonesContainer);
         ShowHormones(thirdhormonesContainer);
+    }
+
+    public void StartGame()
+    {
+        Vector3 worldPosition = game.transform.position;
+        Quaternion worldRotation = game.transform.rotation;
+        Vector3 targetScale = game.transform.localScale;
+
+        game.transform.SetParent(null, false);
+        game.transform.position = worldPosition;
+        game.transform.rotation = worldRotation;
+        game.SetActive(true);
     }
 }
