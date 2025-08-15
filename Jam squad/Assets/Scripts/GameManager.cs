@@ -1,8 +1,8 @@
 ﻿using DG.Tweening;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using System.Collections;
 using UnityEngine.UI;
+using System.Collections;
 
 public class GameManager : MonoBehaviour
 {
@@ -27,13 +27,35 @@ public class GameManager : MonoBehaviour
     [SerializeField] private float fadeTime = 1f;
 
     [Header("Подсказка (опционально)")]
-    [SerializeField] private GameObject pressAnyKeyText; // Например: Text или Image
+    [SerializeField] private GameObject pressAnyKeyText;
+
+    [Header("Меню паузы")]
+    [SerializeField] private GameObject settingsMenu; // Меню настроек (активируется на паузе)
+    [SerializeField] private Image pauseOverlay;     // Затемнение фона (например, черный с alpha)
+    [SerializeField] private float menuScaleDuration = 0.4f;
+    [SerializeField] private Ease menuEase = Ease.OutBack;
 
     private bool objectsInitialized;
+    private bool isPaused = false;
+    private Vector3 _settingsInitialScale;
 
     private void Start()
     {
         InitializeObjects();
+
+        // Настройка меню паузы
+        if (settingsMenu != null)
+        {
+            _settingsInitialScale = settingsMenu.transform.localScale;
+            settingsMenu.SetActive(false);
+            settingsMenu.transform.localScale = Vector3.zero;
+        }
+
+        if (pauseOverlay != null)
+        {
+            pauseOverlay.color = new Color(pauseOverlay.color.r, pauseOverlay.color.g, pauseOverlay.color.b, 0);
+            pauseOverlay.gameObject.SetActive(false);
+        }
     }
 
     void InitializeObjects()
@@ -54,6 +76,74 @@ public class GameManager : MonoBehaviour
         }
 
         objectsInitialized = true;
+    }
+
+    private void Update()
+    {
+        // Проверяем нажатие Escape
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            if (isPaused)
+                ResumeGame();
+            else
+                PauseGame();
+        }
+    }
+
+    public void PauseGame()
+    {
+        if (isPaused || settingsMenu == null) return;
+
+        isPaused = true;
+
+        // Включаем оверлей ДО анимации, но с нулевой альфой
+        if (pauseOverlay != null)
+        {
+            pauseOverlay.gameObject.SetActive(true);
+            pauseOverlay.color = new Color(pauseOverlay.color.r, pauseOverlay.color.g, pauseOverlay.color.b, 0); // сбрасываем альфу
+            pauseOverlay.DOFade(0.7f, 0.3f)
+                .SetUpdate(true); // 🔥 КЛЮЧЕВОЕ: работает на паузе
+        }
+
+        // Показываем меню
+        settingsMenu.SetActive(true);
+        settingsMenu.transform.localScale = Vector3.zero;
+        settingsMenu.transform.DOScale(_settingsInitialScale, menuScaleDuration)
+            .SetEase(menuEase)
+            .SetUpdate(true); // уже было — хорошо
+
+        // Ставим игру на паузу
+        Time.timeScale = 0.1f;
+    }
+
+    public void ResumeGame()
+    {
+        if (!isPaused) return;
+
+        isPaused = false;
+
+        // Анимация исчезновения меню
+        settingsMenu.transform.DOScale(Vector3.zero, menuScaleDuration)
+            .SetEase(Ease.InBack)
+            .SetUpdate(true)
+            .OnComplete(() =>
+            {
+                settingsMenu.SetActive(false);
+
+                // Анимация затухания оверлея
+                if (pauseOverlay != null)
+                {
+                    pauseOverlay.DOFade(0f, 0.3f)
+                        .SetUpdate(true) // 🔥 Работает на паузе
+                        .OnComplete(() =>
+                        {
+                            pauseOverlay.gameObject.SetActive(false);
+                        });
+                }
+            });
+
+        // Снимаем паузу
+        Time.timeScale = 1;
     }
 
     public void ActivateCell(int cellIndex)
@@ -84,7 +174,6 @@ public class GameManager : MonoBehaviour
 
     void DetachAllObjects()
     {
-        // Открепление клеток
         foreach (var cell in cells)
         {
             if (cell == null) continue;
@@ -95,7 +184,6 @@ public class GameManager : MonoBehaviour
             cell.rotation = worldRotation;
         }
 
-        // Открепление контейнеров гормонов
         foreach (var container in hormonesContainers)
         {
             if (container == null) continue;
@@ -106,7 +194,6 @@ public class GameManager : MonoBehaviour
             container.rotation = worldRotation;
         }
 
-        // Открепление дополнительных объектов
         foreach (var obj in additionalObjects)
         {
             if (obj == null) continue;
@@ -117,7 +204,6 @@ public class GameManager : MonoBehaviour
             obj.rotation = worldRotation;
         }
 
-        // Открепление объектов победы
         foreach (var winObj in winObjects)
         {
             if (winObj == null) continue;
@@ -133,26 +219,20 @@ public class GameManager : MonoBehaviour
     {
         if (victoryCamera == null || cameraWinTarget == null) return;
 
-        // Удаляем игрока (если есть)
         Player player = FindAnyObjectByType<Player>();
         if (player != null)
             Destroy(player.gameObject);
 
-        // Отключаем следящую камеру
         if (victoryCamera.TryGetComponent(out SmoothFollowCamera followCam))
             followCam.enabled = false;
 
-        // Главная последовательность
         Sequence mainSequence = DOTween.Sequence();
 
-        // 1. Анимация камеры
         mainSequence.Append(victoryCamera.transform.DOMove(cameraWinTarget.position, cameraMoveTime));
         mainSequence.Join(victoryCamera.transform.DORotate(cameraWinTarget.eulerAngles, cameraMoveTime));
 
-        // 2. Задержка перед показом объектов
         mainSequence.AppendInterval(objectsAppearDelay);
 
-        // 3. Включаем объекты победы
         mainSequence.AppendCallback(() => {
             foreach (var obj in winObjects)
             {
@@ -164,7 +244,6 @@ public class GameManager : MonoBehaviour
             }
         });
 
-        // 4. Анимация появления
         Sequence appearSequence = DOTween.Sequence();
         foreach (var obj in winObjects)
         {
@@ -175,17 +254,14 @@ public class GameManager : MonoBehaviour
         }
         mainSequence.Append(appearSequence);
 
-        // 5. Показываем подсказку и ждём ввода
         mainSequence.AppendCallback(() => {
             if (pressAnyKeyText != null)
                 pressAnyKeyText.SetActive(true);
 
-            mainSequence.Pause(); // Останавливаем последовательность
-
+            mainSequence.Pause();
             StartCoroutine(WaitForPlayerInput(mainSequence));
         });
 
-        // 6. Анимация исчезновения
         Sequence disappearSequence = DOTween.Sequence();
         foreach (var obj in winObjects)
         {
@@ -196,7 +272,6 @@ public class GameManager : MonoBehaviour
         }
         mainSequence.Append(disappearSequence);
 
-        // 7. Выключаем объекты
         mainSequence.AppendCallback(() => {
             foreach (var obj in winObjects)
             {
@@ -208,34 +283,28 @@ public class GameManager : MonoBehaviour
                 pressAnyKeyText.SetActive(false);
         });
 
-        // 8. Затемнение экрана
         if (fadeImage != null)
         {
             mainSequence.AppendCallback(() => fadeImage.gameObject.SetActive(true));
             mainSequence.Append(fadeImage.DOFade(1f, fadeTime));
         }
 
-        // 9. Перезагрузка сцены после затемнения
         mainSequence.AppendCallback(() => {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         });
 
-        // Запускаем последовательность
         mainSequence.Play();
     }
 
     private IEnumerator WaitForPlayerInput(Sequence sequence)
     {
-        // Ждём нажатия клавиши, мыши или касания
         while (!Input.anyKeyDown && Input.touchCount == 0)
         {
             yield return null;
         }
 
-        // На всякий случай ждём один кадр, чтобы избежать дублирования
         yield return null;
 
-        // Продолжаем анимацию
         sequence.Play();
     }
 

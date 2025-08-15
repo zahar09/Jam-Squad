@@ -12,6 +12,11 @@ public class StartMenu : MonoBehaviour
 
     [Header("Credits Window")]
     [SerializeField] private GameObject creditsWindow; // панель "Об авторах"
+
+    [Header("Settings Window")]
+    [SerializeField] private GameObject settingsWindow; // панель "Настройки"
+
+    [Header("Анимации")]
     [SerializeField] private float creditsScaleDuration = 0.4f;
     [SerializeField] private Ease creditsEase = Ease.OutBack;
 
@@ -25,6 +30,8 @@ public class StartMenu : MonoBehaviour
     [SerializeField] private float duration;
 
     private Vector3[] _targetLocalPositions;
+    private Vector3 _creditsInitialScale;
+    private Vector3 _settingsInitialScale;
     private bool _isAnimating;
 
     private void Awake()
@@ -35,11 +42,27 @@ public class StartMenu : MonoBehaviour
         if (_audioSource != null)
             _audioSource.playOnAwake = false;
 
-        // Скрываем окно авторов при старте
+        // Сохраняем оригинальный scale окон
         if (creditsWindow != null)
         {
+            _creditsInitialScale = creditsWindow.transform.localScale;
             creditsWindow.SetActive(false);
             creditsWindow.transform.localScale = Vector3.zero;
+        }
+        else
+        {
+            Debug.LogWarning("creditsWindow не назначен в инспекторе.");
+        }
+
+        if (settingsWindow != null)
+        {
+            _settingsInitialScale = settingsWindow.transform.localScale;
+            settingsWindow.SetActive(false);
+            settingsWindow.transform.localScale = Vector3.zero;
+        }
+        else
+        {
+            Debug.LogWarning("settingsWindow не назначен в инспекторе.");
         }
     }
 
@@ -143,43 +166,72 @@ public class StartMenu : MonoBehaviour
         }
     }
 
-    // ✅ НОВОЕ: Открытие окна "Об авторах"
+    // ✅ ОТКРЫТИЕ ОКНА "ОБ АВТОРАХ"
     public void OpenCredits()
     {
         if (creditsWindow == null) return;
 
-        PlayRandomSound(); // звук при нажатии
+        PlayRandomSound();
 
-        // Сначала убираем основное меню
         AnimateExit();
 
-        // Ждём, пока последний объект закончит анимацию ухода
         DOVirtual.DelayedCall(_objects.Length * _delayBetweenObjects + _slideDuration, () =>
         {
-            // Показываем окно авторов с анимацией появления
             creditsWindow.SetActive(true);
             creditsWindow.transform.localScale = Vector3.zero;
-            creditsWindow.transform.DOScale(Vector3.one, creditsScaleDuration)
+            creditsWindow.transform.DOScale(_creditsInitialScale, creditsScaleDuration)
                 .SetEase(creditsEase);
         });
     }
 
-    // ✅ НОВОЕ: Закрытие окна "Об авторах"
+    // ✅ ЗАКРЫТИЕ ОКНА "ОБ АВТОРАХ"
     public void CloseCredits()
     {
         if (creditsWindow == null) return;
 
-        PlayRandomSound(); // звук при нажатии
+        PlayRandomSound();
 
-        // Сначала анимируем исчезновение окна авторов
         creditsWindow.transform.DOScale(Vector3.zero, creditsScaleDuration)
             .SetEase(Ease.InBack)
             .OnComplete(() =>
             {
                 creditsWindow.SetActive(false);
+                PrepareForAnimation();
+                AnimateEnter();
+            });
+    }
 
-                // Теперь возвращаем основное меню
-                PrepareForAnimation(); // сбрасываем позиции
+    // ✅ ОТКРЫТИЕ ОКНА НАСТРОЕК
+    public void OpenSettings()
+    {
+        if (settingsWindow == null) return;
+
+        PlayRandomSound();
+
+        AnimateExit();
+
+        DOVirtual.DelayedCall(_objects.Length * _delayBetweenObjects + _slideDuration, () =>
+        {
+            settingsWindow.SetActive(true);
+            settingsWindow.transform.localScale = Vector3.zero;
+            settingsWindow.transform.DOScale(_settingsInitialScale, creditsScaleDuration)
+                .SetEase(creditsEase);
+        });
+    }
+
+    // ✅ ЗАКРЫТИЕ ОКНА НАСТРОЕК
+    public void CloseSettings()
+    {
+        if (settingsWindow == null) return;
+
+        PlayRandomSound();
+
+        settingsWindow.transform.DOScale(Vector3.zero, creditsScaleDuration)
+            .SetEase(Ease.InBack)
+            .OnComplete(() =>
+            {
+                settingsWindow.SetActive(false);
+                PrepareForAnimation();
                 AnimateEnter();
             });
     }

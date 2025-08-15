@@ -1,5 +1,4 @@
 using UnityEngine;
-using TMPro;
 using DG.Tweening;
 using UnityEngine.UI;
 using System.Collections.Generic;
@@ -9,9 +8,9 @@ using UnityEngine.SceneManagement;
 public class CellManager : MonoBehaviour
 {
     [Header("Ячейки памяти")]
-    [SerializeField] private GameObject messageObj;
-    [SerializeField] private TextMeshProUGUI messageUI;
-    [SerializeField] private string[] messageTextes;
+    [SerializeField] private GameObject messageObj;        // Объект с UI (показывается/скрывается)
+    [SerializeField] private Image messageImage;          // Новое: Image вместо TextMeshPro
+    [SerializeField] private Sprite[] messageSprites;     // Массив спрайтов вместо строк
 
     [Header("Анимация поражения")]
     [SerializeField] private SmoothFollowCamera _camera;
@@ -25,14 +24,12 @@ public class CellManager : MonoBehaviour
     [Header("Настройки обучения")]
     [SerializeField] private float educationDelayBeforeShrink;
 
-
-
     private bool isEducation = true;
-    private List<string> _availableMessages = new List<string>();
+    private List<Sprite> _availableSprites = new List<Sprite>();
 
     private void Start()
     {
-        _availableMessages = new List<string>(messageTextes);
+        _availableSprites = new List<Sprite>(messageSprites);
 
         if (fadeImage != null)
         {
@@ -42,6 +39,10 @@ public class CellManager : MonoBehaviour
 
         if (_audioSource != null)
             _audioSource.playOnAwake = false;
+
+        // Убедимся, что messageObj изначально выключен
+        if (messageObj != null)
+            messageObj.SetActive(false);
     }
 
     public void PlayRandomSound()
@@ -58,22 +59,27 @@ public class CellManager : MonoBehaviour
         if (isEducation)
         {
             isEducation = false;
-
-            // Задержка перед началом анимации уменьшения
             cell.GetComponent<Cell>().DestroyCell(educationDelayBeforeShrink);
         }
         else
         {
-            if (_availableMessages.Count == 0) return;
-            int randomIndex = Random.Range(0, _availableMessages.Count);
-            messageUI.text = _availableMessages[randomIndex];
-            _availableMessages.RemoveAt(randomIndex);
+            if (_availableSprites.Count == 0) return;
+
+            // Выбираем случайный спрайт
+            int randomIndex = Random.Range(0, _availableSprites.Count);
+            messageImage.sprite = _availableSprites[randomIndex];
+            _availableSprites.RemoveAt(randomIndex);
+
+            // Показываем объект с изображением
             messageObj.SetActive(true);
             PlayRandomSound();
-            GameManager gameManager = FindAnyObjectByType<GameManager>();
-            gameManager.ActivateCell(3 - _availableMessages.Count);
 
-            if (_availableMessages.Count == 0)
+            // Обновляем прогресс в GameManager
+            GameManager gameManager = FindAnyObjectByType<GameManager>();
+            gameManager.ActivateCell(3 - _availableSprites.Count);
+
+            // Если все спрайты собраны — победа
+            if (_availableSprites.Count == 0)
             {
                 WinGame();
             }
@@ -82,7 +88,7 @@ public class CellManager : MonoBehaviour
 
     private void WinGame()
     {
-        GameManager gameManager = FindAnyObjectByType<GameManager>(); ;
+        GameManager gameManager = FindAnyObjectByType<GameManager>();
         gameManager.WinGame();
     }
 
